@@ -14,7 +14,6 @@ func main() {
 	mappings := get_mappings(fdata[2:])
 	answer := run(seeds, mappings)
 	fmt.Println(answer)
-	// 84206669
 }
 
 func run(seeds []int, mappings [][][]int) int {
