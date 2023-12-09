@@ -32,7 +32,7 @@ func run(fdata []string) int {
 				step++
 			}
 		}
-		trailing += get_next_number(current_seq)
+		trailing += get_next_number_2(current_seq)
 	}
 	return trailing
 }
@@ -43,13 +43,34 @@ func get_next_number(current_seq [][]int) int {
 		next_numbers = append(next_numbers, current_seq[i][len(current_seq[i])-1])
 	}
 	fmt.Println(next_numbers)
-	return add_reduce(next_numbers)
+	return reduce_add(next_numbers)
 }
 
-func add_reduce(list []int) int {
+func get_next_number_2(current_seq [][]int) int {
+	var next_numbers []int
+	for i := 0; i < len(current_seq); i++ {
+		next_numbers = append(next_numbers, current_seq[i][0])
+	}
+	fmt.Println(next_numbers)
+	return reduce_add_sub(next_numbers)
+}
+
+func reduce_add(list []int) int {
 	var value int
 	for i := range list {
 		value += list[i]
+	}
+	return value
+}
+
+func reduce_add_sub(list []int) int {
+	var value int
+	for i := range list {
+		if i%2 == 0 {
+			value += list[i]
+		} else {
+			value -= list[i]
+		}
 	}
 	return value
 }
