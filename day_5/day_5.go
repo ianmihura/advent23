@@ -14,6 +14,7 @@ func main() {
 	mappings := get_mappings(fdata[2:])
 	answer := run(seeds, mappings)
 	fmt.Println(answer)
+	// 84206669
 }
 
 func run(seeds []int, mappings [][][]int) int {
@@ -35,41 +36,6 @@ func min(list ...int) int {
 }
 
 func get_next_indexes(indexes []int, origin_map [][]int) []int {
-	//
-	// 	 50 98 2
-	//           from 98 to 98+2 -1
-	//     values map 50 to 50+2 -1
-	//        => values between 98 and 98+2-1 map to 50 and 50+2-1
-	//   52 50 48
-	//           from 50 to 50+48 -1
-	//     values map 52 to 52+48 -1
-	//
-	// 0: destination_range_start
-	// 1: source_range_start
-	// 2: range_length
-	/*
-		seed  soil
-		0     0
-		1     1
-
-		14    14
-		...   ...
-		48    48
-		49    49
-		50    52
-		51    53
-		52    54
-		53    55
-		54    56
-		55    57
-		...   ...
-		78    81
-		...   ...
-		96    98
-		97    99
-		98    50
-		99    51
-	*/
 	var next_indexes []int
 	for idx := range indexes {
 		new_index := -1
@@ -88,21 +54,31 @@ func get_next_indexes(indexes []int, origin_map [][]int) []int {
 			next_indexes = append(next_indexes, indexes[idx])
 		}
 	}
-	fmt.Println(next_indexes)
 	return next_indexes
 }
 
 func get_seeds(fdata string) []int {
 	var result []int
 	data := strings.Split(fdata, " ")[1:]
+	current_range_start := -1
 
 	for i := 0; i < len(data); i++ {
-		c, err := strconv.Atoi(data[i])
-		if err == nil {
-			result = append(result, c)
+		c, _ := strconv.Atoi(data[i])
+		if i%2 == 0 {
+			current_range_start = c
+		} else {
+			result = append(result, new_range(current_range_start, c)...)
 		}
 	}
 	return result
+}
+
+func new_range(start, end int) []int {
+	var r []int
+	for i := start; i < end; i++ {
+		r = append(r, i)
+	}
+	return r
 }
 
 func get_mappings(fdata []string) [][][]int {
