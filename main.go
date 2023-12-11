@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/ianmihura/functional"
 )
 
 func main() {
@@ -32,14 +30,6 @@ func main() {
 	// fmt.Println(this_func_errs(12).unwrap())
 	// fmt.Println(this_func_errs(2))
 	// fmt.Println(this_func_errs(12))
-}
-
-func this_func_errs(input int) *functional.Maybe[int] {
-	if input > 9 {
-		return functional.wrap_err(-1, "number too high")
-	} else {
-		return functional.wrap(input)
-	}
 }
 
 func single_pass(input []int, k int) bool {

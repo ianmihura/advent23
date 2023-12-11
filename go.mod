@@ -1,5 +1,3 @@
-module github.com/ianmihura/go
+module github.com/ianmihura/advent23
 
 go 1.21.4
-
-replace github.com/ianmihura/functional => ./other/functional

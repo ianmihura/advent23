@@ -1,4 +1,4 @@
-package main2
+package main
 
 import (
 	"fmt"
@@ -7,6 +7,10 @@ import (
 	"strings"
 	"sync"
 )
+
+func main() {
+
+}
 
 func experiment() {
 	messages := make(chan int, 1_000_000_000)

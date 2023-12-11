@@ -1,8 +1,17 @@
-package functional
+package main
 
 // Basic errorable monad
 // works with single return value
 // even if error
+
+func this_func_errs(input int) *Maybe[int] {
+	if input > 9 {
+		return wrap_err(-1, "number too high")
+	} else {
+		return wrap(input)
+	}
+}
+
 type Maybe[T any] struct {
 	value T
 	err   string
