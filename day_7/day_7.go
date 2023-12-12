@@ -26,13 +26,13 @@ type Playable interface {
 // -1: first one wins (left input)
 // 0: tie
 // 1: second one wins (right input)
-func get_highest_order(hand_left, hand_right string) int {
+func get_highest_order(hand_left, hand_right rune) int {
 	for o := range ORDER {
-		if ORDER[o] == string(hand_left[0]) && ORDER[o] == string(hand_right[0]) {
+		if ORDER[o] == string(hand_left) && ORDER[o] == string(hand_right) {
 			return 0
-		} else if ORDER[o] == string(hand_left[0]) {
+		} else if ORDER[o] == string(hand_left) {
 			return -1
-		} else if ORDER[o] == string(hand_right[0]) {
+		} else if ORDER[o] == string(hand_right) {
 			return 1
 		}
 	}
@@ -40,22 +40,53 @@ func get_highest_order(hand_left, hand_right string) int {
 	return 0
 }
 
+// score is trailing sum of len(group)^2
+func get_hand_score(hand string) int {
+	groups := []string{string(hand[0])}
+
+	for i := 1; i < len(hand); i++ {
+		match := false
+		for j := range groups {
+			if groups[j][0] == hand[i] {
+				groups[j] += string(hand[i])
+				match = true
+				break
+			}
+		}
+		if !match {
+			groups = append(groups, string(hand[i]))
+		}
+	}
+	score := 0
+	for i := range groups {
+		score += len(groups[i]) * len(groups[i])
+	}
+
+	return score
+}
+
 // Result of battle between two Hands
 // -1: first one wins (left input)
 // 0: tie
 // 1: second one wins (right input)
 func get_battle_result(hand_left, hand_right string) int {
-	for o := range ORDER {
-		if ORDER[o] == string(hand_left[0]) && ORDER[o] == string(hand_right[0]) {
-			return 0
-		} else if ORDER[o] == string(hand_left[0]) {
-			return -1
-		} else if ORDER[o] == string(hand_right[0]) {
-			return 1
+	left_score := get_hand_score(hand_left)
+	right_score := get_hand_score(hand_right)
+
+	if left_score == right_score {
+		for i := range hand_left {
+			order := get_highest_order(rune(hand_left[i]), rune(hand_right[i]))
+			if order != 0 {
+				return order
+			}
 		}
+		// rare case: only if two hands are identical
+		return 0
+	} else if left_score > right_score {
+		return -1
+	} else {
+		return 1
 	}
-	// default case should never happen
-	return 0
 }
 
 // Calculates score for all hands (relative to their order)
