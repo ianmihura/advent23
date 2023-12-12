@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var ORDER []string = []string{"A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"}
+var ORDER []string = []string{"A", "K", "Q", "T", "9", "8", "7", "6", "5", "4", "3", "2", "J"}
 
 type Hands struct {
 	hands []string
@@ -40,23 +40,45 @@ func get_highest_order(hand_left, hand_right rune) int {
 	return 0
 }
 
+func get_longest_group(groups []string) int {
+	max_ids := 0
+	for i := range groups {
+		if len(groups[max_ids]) < len(groups[i]) {
+			max_ids = i
+		}
+	}
+	return max_ids
+}
+
 // score is trailing sum of len(group)^2
 func get_hand_score(hand string) int {
-	groups := []string{string(hand[0])}
+	groups := []string{string("")}
+	j_count := 0
 
-	for i := 1; i < len(hand); i++ {
+	// Separate hand cards into groups of same card
+	for i := 0; i < len(hand); i++ {
+		if string(hand[i]) == "J" {
+			j_count++
+			continue
+		}
 		match := false
 		for j := range groups {
-			if groups[j][0] == hand[i] {
+			if len(groups[j]) > 0 && groups[j][0] == hand[i] {
 				groups[j] += string(hand[i])
 				match = true
-				break
 			}
 		}
 		if !match {
 			groups = append(groups, string(hand[i]))
 		}
 	}
+	if j_count > 0 {
+		max_ids := get_longest_group(groups)
+		for i := 0; i < j_count; i++ {
+			groups[max_ids] += "J"
+		}
+	}
+
 	score := 0
 	for i := range groups {
 		score += len(groups[i]) * len(groups[i])
@@ -73,14 +95,16 @@ func get_battle_result(hand_left, hand_right string) int {
 	left_score := get_hand_score(hand_left)
 	right_score := get_hand_score(hand_right)
 
-	if left_score == right_score {
+	if hand_left == hand_right {
+		return 0
+	} else if left_score == right_score {
 		for i := range hand_left {
 			order := get_highest_order(rune(hand_left[i]), rune(hand_right[i]))
 			if order != 0 {
 				return order
 			}
 		}
-		// rare case: only if two hands are identical
+		// default case should never happen
 		return 0
 	} else if left_score > right_score {
 		return -1
@@ -154,7 +178,7 @@ func format(byte_data []byte) Hands {
 }
 
 func main() {
-	data, _ := os.ReadFile("./sample_input.txt")
+	data, _ := os.ReadFile("./full_input.txt")
 	hand_list := format(data)
 	answer := run(hand_list)
 	fmt.Println(answer)
