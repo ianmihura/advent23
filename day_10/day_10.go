@@ -85,7 +85,25 @@ func get_next_tile_pos(chart []string, p Path) (int, int) {
 	}
 }
 
-func run(chart []string) int {
+func run_2(chart []string, path Path) {
+	// Shoelace formula
+	trailing := 0
+	for i := 0; i < len(path.x); i++ {
+		if i == len(path.x)-1 {
+			trailing += (path.y[i] + path.y[0]) * (path.x[i] - path.x[0])
+		} else {
+			trailing += (path.y[i] + path.y[i+1]) * (path.x[i] - path.x[i+1])
+		}
+	}
+	area := trailing / 2
+
+	// Pick's theorem
+	inner := area - (len(path.x) / 2) + 1
+
+	fmt.Println(inner)
+}
+
+func run(chart []string) {
 	var x, y = find_starting_pos(chart)
 	path := Path{
 		x: []int{x},
@@ -104,12 +122,13 @@ func run(chart []string) int {
 	}
 	fmt.Println("final path:", path)
 
-	return get_farthest_dist(path)
+	run_2(chart, path)
+
+	get_farthest_dist(path)
 }
 
 func main() {
 	data, _ := os.ReadFile("./full_input.txt")
 	fdata := strings.Split(string(data), "\n")
-	answer := run(fdata)
-	fmt.Println(answer)
+	run(fdata)
 }
