@@ -3,35 +3,62 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
-// Remainder of a / b
-// ex: 10 / 3 = 3r1
-func get_div_remainder(a, b int) int {
-	r := a
-	for r >= b {
-		r -= b
-	}
-	return r
-}
-
-func get_next_hash_value(data string) int {
+func get_hash_value(data string) int {
 	result := 0
 	for d := range data {
-		result += int(data[d])
-		result *= 17
-		result = get_div_remainder(result, 256)
+		result = ((result + int(data[d])) * 17) % 256
 	}
 	return result
 }
 
-func run(data []string) int {
-	value := 0
-	for d := range data {
-		value += get_next_hash_value(data[d])
-		fmt.Println(data[d], value)
+func get_lens_index(box [][]string, lens_name string) int {
+	for l, lens := range box {
+		if lens[0] == lens_name {
+			return l
+		}
 	}
+	return -1
+}
+
+func run(data []string) int {
+	boxes := make([][][]string, 256)
+	for _, d := range data {
+
+		if d[len(d)-1] == '-' {
+			lens_name := strings.Split(d, "-")[0]
+			box := get_hash_value(lens_name)
+
+			lens_index := get_lens_index(boxes[box], lens_name)
+			if lens_index > -1 {
+				boxes[box] = append(boxes[box][:lens_index], boxes[box][lens_index+1:]...)
+			}
+
+		} else {
+			lens_name := strings.Split(d, "=")[0]
+			lens_power := strings.Split(d, "=")[1]
+			box := get_hash_value(lens_name)
+
+			lens_index := get_lens_index(boxes[box], lens_name)
+			if lens_index > -1 {
+				boxes[box][lens_index][1] = lens_power
+			} else {
+				boxes[box] = append(boxes[box], []string{lens_name, lens_power})
+			}
+		}
+	}
+
+	value := 0
+	for b, box := range boxes {
+		for l, lens := range box {
+			lens_power, _ := strconv.Atoi(lens[1])
+			value += (b + 1) * (l + 1) * lens_power
+		}
+	}
+
 	return value
 }
 
